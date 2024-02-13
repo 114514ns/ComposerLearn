@@ -1,33 +1,22 @@
 package cn.pprocket.composerlearn.page
 
 import android.content.Context
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.*
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import cn.pprocket.composerlearn.MainActivity
 import cn.pprocket.composerlearn.components.VideoCard
-
 import cn.pprocket.`object`.Video
 import coil.ImageLoader
-import coil.compose.rememberImagePainter
 import coil.util.DebugLogger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
@@ -37,10 +26,8 @@ import okhttp3.ResponseBody
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import javax.crypto.Cipher
 import javax.crypto.spec.SecretKeySpec
-import kotlin.random.Random
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VideoListPage(navController: NavController) {
     var recommend by remember { mutableStateOf(emptyList<Video>()) }
@@ -58,7 +45,6 @@ fun VideoListPage(navController: NavController) {
             }
         }
     }
-    var index = 0
     if (recommend.isEmpty()) {
         return
     }
@@ -76,68 +62,11 @@ fun VideoListPage(navController: NavController) {
             key = { index -> recommend[index].time}
         ) { index ->
             val video = recommend[index]
-            /*
-            Card(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(8.dp)
-                    .height(200.dp)
-                    .width(325.dp),
-                onClick = {
-                    navController.navigate("video")
-                    //show video info in dialog
-                    //showDialog = true
-                    //showText = "Title: ${video.title}\n Author : ${video.author}\n "
-
-                }
-
-            ) {
-                Image(
-                    painter = rememberImagePainter(
-                        data = video.cover,
-                        imageLoader = imageLoader
-                    ),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .weight(0.8f)
-                )
-                Text(
-                    text = video.title,
-                    fontSize = 14.sp,
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .fillMaxWidth()
-                        .weight(0.2f)
-                        .clip(MaterialTheme.shapes.medium)
-                )
-                */
             VideoCard(video = video)
 
         }
 
     }
-
-    /*
-    val itemsList = (0..5).toList()
-    val itemsIndexedList = listOf("A", "B", "C")
-
-    val itemModifier = Modifier.border(1.dp, Color.Blue).height(80.dp).wrapContentSize()
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(2)
-    ) {
-        items(itemsList) {
-            Text("Item is $it", itemModifier)
-        }
-        /*
-        itemsIndexed(itemsIndexedList) { index, item ->
-            Text("Item at index $index is $item", itemModifier)
-        }
-
-         */
-    }
-
-     */
     LaunchedEffect(listState) {
         snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
             .collectLatest { lastIndex ->
@@ -154,10 +83,7 @@ fun VideoListPage(navController: NavController) {
                 }
             }
     }
-
-
 }
-
 
 fun createCustomImageLoader(context: Context): ImageLoader {
 
@@ -205,48 +131,6 @@ class EncryptInterceptor : okhttp3.Interceptor {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun AlertDialogExample(
-    onDismissRequest: () -> Unit,
-    onConfirmation: () -> Unit,
-    dialogTitle: String,
-    dialogText: String,
-    icon: ImageVector,
-) {
-    AlertDialog(
-        icon = {
-            Icon(icon, contentDescription = "Example Icon")
-        },
-        title = {
-            Text(text = dialogTitle)
-        },
-        text = {
-            Text(text = dialogText)
-        },
-        onDismissRequest = {
-            onDismissRequest()
-        },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    onConfirmation()
-                }
-            ) {
-                Text("Confirm")
-            }
-        },
-        dismissButton = {
-            TextButton(
-                onClick = {
-                    onDismissRequest()
-                }
-            ) {
-                Text("Dismiss")
-            }
-        }
-    )
-}
 @Composable
 fun getImageLoader():ImageLoader {
     return  createCustomImageLoader(LocalContext.current)

@@ -14,21 +14,7 @@
             android:supportsRtl="true"
             android:theme="@style/Theme.ComposerLearn"
             tools:targetApi="31">
-        <activity
-                android:name=".page.VideoDetailPage"
-                android:exported="false"
-                android:label="@string/title_activity_video_detail_page"
-                android:theme="@style/Theme.ComposerLearn"/>
-        <activity
-                android:name=".page.VideoPage"
-                android:exported="false"
-                android:label="@string/title_activity_video_page"
-                android:theme="@style/Theme.ComposerLearn"/>
-        <activity
-                android:name=".page.UserPage"
-                android:exported="false"
-                android:label="@string/title_activity_user_page"
-                android:theme="@style/Theme.ComposerLearn"/>
+
         <activity
                 android:name=".MainActivity"
                 android:exported="true"

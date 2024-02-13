@@ -17,10 +17,6 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
 
 
-class VideoDetailPage () {
-
-}
-
 @Composable
 fun VideoDetailPage(navController: NavController) {
     VideoPlayer("https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL3YvcyFBa2lMd2djRWVHYkR4am00SVl6RWxlQzlSNHI0P2U9UUprNVBP.mp4")
@@ -28,9 +24,6 @@ fun VideoDetailPage(navController: NavController) {
 @Composable
 fun VideoPlayer(videoUrl: String) {
     val context = LocalContext.current
-    val density = LocalDensity.current.density
-
-    // Create an AndroidView that wraps the VideoView
     AndroidView(
         modifier = Modifier.fillMaxSize(),
         factory = { VideoView(context).apply { setVideoPath(videoUrl) } },
