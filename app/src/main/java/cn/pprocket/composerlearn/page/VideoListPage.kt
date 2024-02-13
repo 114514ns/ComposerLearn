@@ -1,6 +1,7 @@
 package cn.pprocket.composerlearn.page
 
 import android.content.Context
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -53,7 +54,10 @@ fun VideoListPage(navController: NavController) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(1),
         state = listState,
-        modifier = Modifier.fillMaxSize().padding(bottom = 50.dp)
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(bottom = 50.dp)
+            .background(MaterialTheme.colorScheme.surfaceContainerLow)
 
     ) {
 
@@ -62,7 +66,7 @@ fun VideoListPage(navController: NavController) {
             key = { index -> recommend[index].time}
         ) { index ->
             val video = recommend[index]
-            VideoCard(video = video)
+            VideoCard(video = video, navController = navController)
 
         }
 

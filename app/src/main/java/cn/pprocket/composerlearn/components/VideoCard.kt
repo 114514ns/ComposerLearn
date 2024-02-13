@@ -1,5 +1,6 @@
 package cn.pprocket.composerlearn.components
 
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -8,33 +9,50 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.Star
-import androidx.compose.material3.Card
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import cn.pprocket.composerlearn.MainActivity
 import cn.pprocket.composerlearn.page.getImageLoader
 import cn.pprocket.`object`.User
 import cn.pprocket.`object`.Video
 import coil.compose.rememberImagePainter
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.random.Random
 
 @Composable
-fun VideoCard(video: Video) {
+fun VideoCard(video: Video,navController: NavController) {
+    val coroutineScope = rememberCoroutineScope()
     Card(
         modifier = Modifier
             .padding(8.dp)
             .fillMaxWidth(0.8f)
             .height(380.dp)
             .clip(RoundedCornerShape(22.dp))
+            .clickable {
+                coroutineScope.launch {
+                    withContext(Dispatchers.IO) {
+                        val playLink = MainActivity.client.getPlayLink(video)
+                        val encodedPlayLink = Uri.encode(playLink)
+                        withContext(Dispatchers.Main) {
+                            navController.navigate("video/${encodedPlayLink}")
+                        }
+                    }
+
+                }
+            }
+
     ) {
         Column {
 
@@ -53,18 +71,28 @@ fun VideoCard(video: Video) {
                         .weight(3f)
                         .clip(RoundedCornerShape(12.dp))
                 )
-                Text(
-                    text = video.author.name,
+                Column {
+                    Text(
+                        text = video.author.name,
+                        modifier = Modifier
+                            .padding(top = 5.dp),
+                        style = MaterialTheme.typography.titleMedium
+
+                    )
+                    Text(
+                        text = Random.nextInt(21, 8547).toString() + "followers",
+                        modifier = Modifier,
+                        fontWeight = FontWeight.Light,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontSize = 13.sp
+
+                    )
+                }
+                Box(
                     modifier = Modifier
-                        .align(Alignment.CenterVertically)
-                        .clickable {
-
-                        }
-
+                        .padding(8.dp)
+                        .weight(8f)
                 )
-                Box(modifier = Modifier
-                    .padding(8.dp)
-                    .weight(8f))
 
             }
             Image(
@@ -87,7 +115,7 @@ fun VideoCard(video: Video) {
                     .padding(8.dp)
                     .fillMaxWidth()
                     .clip(MaterialTheme.shapes.medium)
-                    .weight(2.5f)
+                    .weight(2f)
             )
             Row(
                 modifier = Modifier
@@ -97,43 +125,20 @@ fun VideoCard(video: Video) {
                     .weight(2f)
             ) {
                 Icon(
-                    imageVector = Icons.Outlined.Star,
-                    contentDescription = "观看次数"
-                )
-                Text(
-                    text = "观看次数: ${video.views}",
-                    fontSize = 12.sp,
-                    modifier = Modifier
-                        .weight(1f)
-                )
-                Icon(
                     imageVector = Icons.Default.Favorite,
-                    contentDescription = "点赞次数"
+                    contentDescription = "点赞次数",
+                    tint = Color.Red,
                 )
                 Text(
-                    text = "点赞次数: ${video.views+Random.nextInt(100)}",
-                    fontSize = 12.sp,
+                    text = Random.nextInt(1000).toString(),
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
                     modifier = Modifier
-                        .weight(1f)
+                        .padding(8.dp)
+                        .align(Alignment.CenterVertically)
                 )
             }
         }
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun PreviewVideoCard() {
-    var video = Video()
-    video.title = "Video Title"
-    video.cover =
-        "https://dlink.host/1drv/aHR0cHM6Ly8xZHJ2Lm1zL3YvcyFBa2lMd2djRWVHYkR4am00SVl6RWxlQzlSNHI0P2U9UUprNVBP.mp4"
-    video.setLength(100)
-    val author = User()
-    author.name = "Uploader"
-    video.author = author
-
-    VideoCard(
-        video
-    )
-}

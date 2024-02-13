@@ -1,15 +1,15 @@
 package cn.pprocket.composerlearn
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.animation.AnimatedContentTransitionScope
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
@@ -20,21 +20,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import cn.pprocket.composerlearn.page.*
 import cn.pprocket.composerlearn.ui.theme.ComposerLearnTheme
 import cn.pprocket.impl.AlphaImpl
-import com.google.gson.Gson
 import kotlinx.coroutines.*
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import java.security.Security
+import java.util.UUID
 
 
-var gson = Gson()
+
 
 class MainActivity : ComponentActivity() {
 
@@ -61,12 +63,23 @@ class MainActivity : ComponentActivity() {
         val navController = rememberNavController()
         var selectedItem by remember { mutableStateOf(0) }
         val items = listOf("主页", "我喜欢的", "设置")
-
+        var context = LocalContext.current
         LaunchedEffect(Unit) {
             try {
                 // 在后台线程执行网络请求
                 withContext(Dispatchers.IO) {
-                    client.login("7c706e97-108a-3f61-8e07-14da33dea564")
+                    val preferencesManager = PreferencesManager(context)
+                    var uuid = preferencesManager.getData("uuid", "none")
+                    if (uuid == "none") {
+                        uuid = UUID.randomUUID().toString()
+                        preferencesManager.saveData("uuid", uuid)
+                        Log.i("T", "uuid doesn't exist ,generate new one $uuid")
+                    } else {
+                        Log.i("T", "uuid exist $uuid")
+                    }
+                    Log.i("T", "current uuid $uuid")
+                    uuid = preferencesManager.getData("uuid", "none")
+                    client.login(uuid)
                     // 在主线程更新 UI
                     withContext(Dispatchers.Main) {
                         //Toast.makeText(this@MainActivity, "登录成功\nCookie   " , Toast.LENGTH_SHORT).show()
@@ -207,39 +220,38 @@ class MainActivity : ComponentActivity() {
                  */
 
 
-            },
-            content = {
+            }
+        ) {
 
-                // 使用 Column 布局容器
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(bottom = 70.dp)
+            // 使用 Column 布局容器
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(bottom = 70.dp)
 
-                ) {
-                    NavHost(
-                        navController = navController,
-                        startDestination = "home",
-                    )
+            ) {
+                NavHost(
+                    navController = navController,
+                    startDestination = "home",
+                )
 
-                    {
-                        composable("list") { VideoListPage(navController) }
-                        composable("home") { UserPage(navController) }
-                        composable("video") { VideoDetailPage(navController) }
-                    }
+                {
+                    composable("list") { VideoListPage(navController) }
+                    composable("home") { UserPage(navController) }
+                    composable(
+                        "video/{link}",
+                        arguments = listOf(navArgument("link") {
+                            type = NavType.StringType
+                        })) { backStackEntry ->
+                            val string = backStackEntry.arguments?.getString("link")
+                            VideoDetailPage(navController, string)
+                        }
                 }
             }
-        )
-    }
-
-
-    @Preview
-    @Composable
-    fun GreetingPreview() {
-        ComposerLearnTheme {
-            Root()
         }
     }
+
+
 
     companion object {
         var client = AlphaImpl()
@@ -247,6 +259,20 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun NavIcon() {
+    }
+}
+class PreferencesManager(context: Context) {
+    private val sharedPreferences: SharedPreferences =
+        context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+
+    fun saveData(key: String, value: String) {
+        val editor = sharedPreferences.edit()
+        editor.putString(key, value)
+        editor.apply()
+    }
+
+    fun getData(key: String, defaultValue: String): String {
+        return sharedPreferences.getString(key, defaultValue) ?: defaultValue
     }
 }
 
