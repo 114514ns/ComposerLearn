@@ -3,13 +3,18 @@ package cn.pprocket.composerlearn.page
 import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -51,12 +56,22 @@ fun VideoListPage(navController: NavController) {
     }
     var page = 1
     val listState = rememberLazyGridState()
+    var searchText by remember { mutableStateOf("searchText") }
+    TextField(
+        value = searchText,
+        onValueChange = { newText -> searchText = newText },
+        label = { Text("Search") },
+        singleLine = true,
+        leadingIcon = { Icon(Icons.Filled.Search, contentDescription = "Search Icon", tint = Color.Gray) },
+        modifier = Modifier.fillMaxWidth()
+            .height(50.dp)
+    )
     LazyVerticalGrid(
         columns = GridCells.Fixed(1),
         state = listState,
         modifier = Modifier
             .fillMaxSize()
-            .padding(bottom = 50.dp)
+            //.padding(bottom = 50.dp)
             .background(MaterialTheme.colorScheme.surfaceContainerLow)
 
     ) {

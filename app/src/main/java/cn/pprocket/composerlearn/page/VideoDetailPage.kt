@@ -26,10 +26,6 @@ import androidx.navigation.NavController
 @Composable
 fun VideoDetailPage(navController: NavController, string: String?) {
     var decodedString = Uri.decode(string ?: "https://www.loliapi.com/acg/pp")
-    Snackbar {
-
-        Text("The arg is $decodedString")
-    }
     VideoPlayer(decodedString )
 }
 @OptIn(UnstableApi::class)
@@ -61,5 +57,9 @@ fun VideoPlayer(videoUrl: String) {
             playerView.onResume()
             playerView.setOnTouchListener { _, event -> gestureDetector.onTouchEvent(event) }
         },
+        onRelease = { playerView ->
+            playerView.player = null
+            exoPlayer.release()
+        }
     )
 }

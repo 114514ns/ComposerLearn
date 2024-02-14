@@ -5,23 +5,25 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -82,7 +84,7 @@ class MainActivity : ComponentActivity() {
                     client.login(uuid)
                     // 在主线程更新 UI
                     withContext(Dispatchers.Main) {
-                        //Toast.makeText(this@MainActivity, "登录成功\nCookie   " , Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@MainActivity, "登录成功 " , Toast.LENGTH_SHORT).show()
                     }
                 }
             } catch (e: Exception) {
@@ -90,8 +92,29 @@ class MainActivity : ComponentActivity() {
                 e.printStackTrace()
             }
         }
+        val openAlertDialog = remember { mutableStateOf(true) }
 
-
+        // ...
+        when {
+            // ...
+            openAlertDialog.value -> {
+                AlertDialogExample(
+                    onDismissRequest = { openAlertDialog.value = false },
+                    onConfirmation = {
+                        openAlertDialog.value = false
+                        //println("Confirmation registered") // Add logic here to handle confirmation.
+                    },
+                    dialogTitle = "提示",
+                    dialogText = "" +
+                            "1. 本软件仅供学习交流使用，不得用于任何商业用途，否则后果自负\n\n" +
+                            "2. 版本：24.2.13  Work in progress\n\n" +
+                            "3. Made with ❤️ by pprocket\n\n"+
+                            "4. 本软件使用的是开源协议，你可以在github上找到源代码\n\n"+
+                            "5. 第一页暂时可以忽略",
+                    icon = Icons.Default.Info
+                )
+            }
+        }
         Scaffold(
 
             bottomBar = {
@@ -274,5 +297,38 @@ class PreferencesManager(context: Context) {
     fun getData(key: String, defaultValue: String): String {
         return sharedPreferences.getString(key, defaultValue) ?: defaultValue
     }
+}
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AlertDialogExample(
+    onDismissRequest: () -> Unit,
+    onConfirmation: () -> Unit,
+    dialogTitle: String,
+    dialogText: String,
+    icon: ImageVector,
+) {
+    AlertDialog(
+        icon = {
+            Icon(icon, contentDescription = "Example Icon")
+        },
+        title = {
+            Text(text = dialogTitle)
+        },
+        text = {
+            Text(text = dialogText)
+        },
+        onDismissRequest = {
+            onDismissRequest()
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    onConfirmation()
+                }
+            ) {
+                Text("确认")
+            }
+        },
+    )
 }
 

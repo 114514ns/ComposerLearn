@@ -2,6 +2,8 @@ package cn.pprocket.composerlearn.components
 
 import android.net.Uri
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -103,9 +105,11 @@ fun VideoCard(video: Video,navController: NavController) {
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp))
                     .weight(8f)
-                    .height(200.dp),
+                    .padding(12.dp)
+                    .height(200.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .border(2.dp, Color.DarkGray, RoundedCornerShape(12.dp)),
                 contentScale = ContentScale.Crop
             )
             Text(
@@ -116,6 +120,7 @@ fun VideoCard(video: Video,navController: NavController) {
                     .fillMaxWidth()
                     .clip(MaterialTheme.shapes.medium)
                     .weight(2f)
+                    .padding(start = 12.dp)
             )
             Row(
                 modifier = Modifier
@@ -124,19 +129,30 @@ fun VideoCard(video: Video,navController: NavController) {
                     .clip(MaterialTheme.shapes.medium)
                     .weight(2f)
             ) {
-                Icon(
-                    imageVector = Icons.Default.Favorite,
-                    contentDescription = "点赞次数",
-                    tint = Color.Red,
-                )
-                Text(
-                    text = Random.nextInt(1000).toString(),
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold,
+                Row(
                     modifier = Modifier
-                        .padding(8.dp)
                         .align(Alignment.CenterVertically)
-                )
+                        //.background(MaterialTheme.colorScheme.surfaceContainerLow)
+                        .clip(RoundedCornerShape(22.dp))
+                        .padding(start = 12.dp)
+                        //.border(2.dp, Color.Red, RoundedCornerShape(22.dp))
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Favorite,
+                        contentDescription = "点赞次数",
+                        tint = Color.Red,
+                        modifier = Modifier
+                            .align(Alignment.CenterVertically)
+                    )
+                    Text(
+                        text = Random.nextInt(1000).toString(),
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .align(Alignment.CenterVertically)
+                    )
+                }
             }
         }
     }
