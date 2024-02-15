@@ -66,12 +66,12 @@ dependencies {
 
     val nav_version = "2.7.6"
 
-    implementation("androidx.compose.ui:ui")
-    implementation("androidx.compose.ui:ui-graphics")
+    implementation("androidx.compose.ui:ui:1.6.1")
+    implementation("androidx.compose.ui:ui-graphics:1.3.1")
     //implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3:1.2.0")
-    debugImplementation("androidx.compose.ui:ui-tooling")
-    debugImplementation("androidx.compose.ui:ui-test-manifest")
+    debugImplementation("androidx.compose.ui:ui-tooling:1.6.1")
+    debugImplementation("androidx.compose.ui:ui-test-manifest:1.6.1")
 
 
     implementation("androidx.activity:activity-compose:1.8.2")
@@ -93,7 +93,7 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp-jvm:5.0.0-alpha.11")
     implementation("org.bouncycastle:bcprov-jdk18on:1.77")
 
-    implementation("com.github.114514ns:SexSDK:4791fb0a4f") {
+    implementation("com.github.114514ns:SexSDK:c464a9067b") {
         exclude(group = "com.squareup.okhttp3", module = "okhttp-jvm")
     }
 

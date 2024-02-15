@@ -2,20 +2,20 @@ package cn.pprocket.composerlearn.page
 
 import android.content.Context
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -24,8 +24,10 @@ import cn.pprocket.composerlearn.components.VideoCard
 import cn.pprocket.`object`.Video
 import coil.ImageLoader
 import coil.util.DebugLogger
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
@@ -57,34 +59,46 @@ fun VideoListPage(navController: NavController) {
     var page = 1
     val listState = rememberLazyGridState()
     var searchText by remember { mutableStateOf("searchText") }
-    TextField(
-        value = searchText,
-        onValueChange = { newText -> searchText = newText },
-        label = { Text("Search") },
-        singleLine = true,
-        leadingIcon = { Icon(Icons.Filled.Search, contentDescription = "Search Icon", tint = Color.Gray) },
-        modifier = Modifier.fillMaxWidth()
-            .height(50.dp)
-    )
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(1),
-        state = listState,
-        modifier = Modifier
-            .fillMaxSize()
-            //.padding(bottom = 50.dp)
-            .background(MaterialTheme.colorScheme.surfaceContainerLow)
+    Column {
+        TextField(
+            value = searchText,
+            onValueChange = { newText -> searchText = newText },
+            label = { Text("Search") },
+            singleLine = true,
+            leadingIcon = { Icon(Icons.Filled.Search, contentDescription = "Search Icon", tint = Color.Gray) },
+            modifier = Modifier.fillMaxWidth()
+                .height(75.dp)
+                .padding(10.dp)
+                .clip(RoundedCornerShape(15.dp)),
+            keyboardActions = KeyboardActions(onDone = {
+                CoroutineScope(Dispatchers.IO).launch {
+                    val response = MainActivity.client.search(searchText, 1)
+                    withContext(Dispatchers.Main) {
+                        recommend = response
+                    }
+                }
+            })
+        )
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(1),
+            state = listState,
+            modifier = Modifier
+                .fillMaxSize()
+                //.padding(bottom = 50.dp)
+                .background(MaterialTheme.colorScheme.surfaceContainerLow)
 
-    ) {
+        ) {
 
-        items(
-            recommend.size,
-            key = { index -> recommend[index].time}
-        ) { index ->
-            val video = recommend[index]
-            VideoCard(video = video, navController = navController)
+            items(
+                recommend.size,
+                key = { index -> recommend[index].time}
+            ) { index ->
+                val video = recommend[index]
+                VideoCard(video = video, navController = navController)
+
+            }
 
         }
-
     }
     LaunchedEffect(listState) {
         snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
@@ -93,11 +107,20 @@ fun VideoListPage(navController: NavController) {
                 if (lastIndex != null && lastIndex >= recommend.size - 1) {
                     // 在后台线程执行网络请求
                     withContext(Dispatchers.IO) {
-                        val response = MainActivity.client.getRecommend(++page)
-                        // 在主线程更新 UI
-                        withContext(Dispatchers.Main) {
-                            recommend = recommend + response
+                        if (searchText == "searchText") {
+                            val response = MainActivity.client.getRecommend(++page)
+                            // 在主线程更新 UI
+                            withContext(Dispatchers.Main) {
+                                recommend = recommend + response
+                            }
+                        } else {
+                            val response = MainActivity.client.search(searchText, ++page)
+                            // 在主线程更新 UI
+                            withContext(Dispatchers.Main) {
+                                recommend = recommend + response
+                            }
                         }
+
                     }
                 }
             }

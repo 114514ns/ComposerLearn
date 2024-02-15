@@ -1,6 +1,16 @@
 <component name="InspectionProjectProfileManager">
   <profile version="1.0">
     <option name="myName" value="Project Default" />
+    <inspection_tool class="GradlePackageUpdate" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <option name="excludeList">
+        <list>
+          <option value="androidx.compose.ui:ui-tooling-preview" />
+          <option value="androidx.compose.ui:ui-tooling" />
+          <option value="androidx.compose.ui:ui-test-manifest" />
+          <option value="androidx.compose.ui:ui-graphics" />
+        </list>
+      </option>
+    </inspection_tool>
     <inspection_tool class="PreviewAnnotationInFunctionWithParameters" enabled="true" level="ERROR" enabled_by_default="true">
       <option name="composableFile" value="true" />
       <option name="previewFile" value="true" />
