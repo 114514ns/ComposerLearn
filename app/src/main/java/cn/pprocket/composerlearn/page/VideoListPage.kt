@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import cn.pprocket.composerlearn.MainActivity
 import cn.pprocket.composerlearn.components.VideoCard
+import cn.pprocket.impl.AlphaImpl
 import cn.pprocket.`object`.Video
 import coil.ImageLoader
 import coil.util.DebugLogger
@@ -58,7 +59,7 @@ fun VideoListPage(navController: NavController) {
     }
     var page = 1
     val listState = rememberLazyGridState()
-    var searchText by remember { mutableStateOf("searchText") }
+    var searchText by remember { mutableStateOf("") }
     Column {
         TextField(
             value = searchText,
@@ -91,9 +92,12 @@ fun VideoListPage(navController: NavController) {
 
             items(
                 recommend.size,
-                key = { index -> recommend[index].time}
+                key = { index -> recommend[index].id}
             ) { index ->
                 val video = recommend[index]
+                if (MainActivity.client is AlphaImpl) {
+                    video.author.avatar = "https://www.loliapi.com/acg/pp"
+                }
                 VideoCard(video = video, navController = navController)
 
             }
@@ -107,7 +111,7 @@ fun VideoListPage(navController: NavController) {
                 if (lastIndex != null && lastIndex >= recommend.size - 1) {
                     // 在后台线程执行网络请求
                     withContext(Dispatchers.IO) {
-                        if (searchText == "searchText") {
+                        if (searchText == "") {
                             val response = MainActivity.client.getRecommend(++page)
                             // 在主线程更新 UI
                             withContext(Dispatchers.Main) {
@@ -160,7 +164,7 @@ class EncryptInterceptor : okhttp3.Interceptor {
         val response = chain.proceed(request)
 
         // 检查响应的URL是否以"ceb"结尾
-        if (response.isSuccessful && response.request.url.toString().endsWith("ceb")) {
+        if (response.isSuccessful && response.request.url.toString().endsWith("ceb") && MainActivity.client is AlphaImpl) {
             val decryptedBody = decryptResponse(response.body)
             val response = response.newBuilder()
                 .body(ResponseBody.create(response.body?.contentType(), decryptedBody))

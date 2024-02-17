@@ -64,10 +64,9 @@ kotlin {
 
 dependencies {
 
-    val nav_version = "2.7.6"
 
     implementation("androidx.compose.ui:ui:1.6.1")
-    implementation("androidx.compose.ui:ui-graphics:1.3.1")
+    implementation("androidx.compose.ui:ui-graphics:1.6.1")
     //implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3:1.2.0")
     debugImplementation("androidx.compose.ui:ui-tooling:1.6.1")
@@ -75,11 +74,12 @@ dependencies {
 
 
     implementation("androidx.activity:activity-compose:1.8.2")
-    implementation("androidx.navigation:navigation-compose:$nav_version")
+    implementation("androidx.navigation:navigation-compose:2.7.7")
 
     implementation("androidx.media3:media3-exoplayer:1.2.1")
     implementation("androidx.media3:media3-ui:1.2.1")
     implementation("androidx.media3:media3-exoplayer-hls:1.2.1")
+    implementation("androidx.media3:media3-exoplayer-dash:1.2.1")
     implementation("androidx.datastore:datastore-preferences:1.0.0")
 
     implementation("io.coil-kt:coil-compose:2.5.0") {
@@ -93,7 +93,7 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp-jvm:5.0.0-alpha.11")
     implementation("org.bouncycastle:bcprov-jdk18on:1.77")
 
-    implementation("com.github.114514ns:SexSDK:c464a9067b") {
+    implementation("com.github.114514ns:SexSDK:ef6408ecbb") {
         exclude(group = "com.squareup.okhttp3", module = "okhttp-jvm")
     }
 

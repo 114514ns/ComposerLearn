@@ -3,11 +3,8 @@ package cn.pprocket.composerlearn.page
 import android.net.Uri
 import android.view.GestureDetector
 import android.view.MotionEvent
-import android.widget.VideoView
 import androidx.annotation.OptIn
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Snackbar
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -15,12 +12,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.media3.common.MediaItem
 import androidx.media3.common.util.UnstableApi
-import androidx.media3.common.util.Util
-import androidx.media3.datasource.DefaultDataSourceFactory
+import androidx.media3.datasource.DataSource
+import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.SimpleExoPlayer
 import androidx.media3.exoplayer.hls.HlsMediaSource
+import androidx.media3.exoplayer.source.MediaSource
+import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.ui.PlayerView
 import androidx.navigation.NavController
+import cn.pprocket.cn.pprocket.impl.BilibiliImpl
+import cn.pprocket.composerlearn.MainActivity
 
 
 @Composable
@@ -32,9 +33,21 @@ fun VideoDetailPage(navController: NavController, string: String?) {
 @Composable
 fun VideoPlayer(videoUrl: String) {
     val context = LocalContext.current
+    val headers = mutableMapOf<String,String>()
+    headers["Referer"] = "https://www.bilibili.com"
+    headers["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
     val exoPlayer = remember {
-        val dataSourceFactory = DefaultDataSourceFactory(context, Util.getUserAgent(context, context.packageName))
-        val mediaSource = HlsMediaSource.Factory(dataSourceFactory).createMediaSource(MediaItem.fromUri(videoUrl))
+        val dataSourceFactory =
+            DataSource.Factory {
+                val dataSource = DefaultHttpDataSource.Factory()
+                // Set a custom authentication request header.
+                dataSource.setDefaultRequestProperties(headers)
+                dataSource.createDataSource()
+            }
+        var mediaSource:MediaSource = HlsMediaSource.Factory(dataSourceFactory).createMediaSource(MediaItem.fromUri(videoUrl))
+        if (MainActivity.client is BilibiliImpl) {
+            mediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(MediaItem.fromUri(videoUrl))
+        }
         val player = SimpleExoPlayer.Builder(context).build().apply {
             setMediaSource(mediaSource)
             prepare()

@@ -19,14 +19,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import cn.pprocket.composerlearn.MainActivity
 import cn.pprocket.composerlearn.page.getImageLoader
+import cn.pprocket.impl.AlphaImpl
 import cn.pprocket.`object`.User
 import cn.pprocket.`object`.Video
+import coil.ImageLoader
+import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -34,7 +38,7 @@ import kotlinx.coroutines.withContext
 import kotlin.random.Random
 
 @Composable
-fun VideoCard(video: Video,navController: NavController) {
+fun VideoCard(video: Video, navController: NavController) {
     val coroutineScope = rememberCoroutineScope()
     Card(
         modifier = Modifier
@@ -63,7 +67,7 @@ fun VideoCard(video: Video,navController: NavController) {
             ) {
                 Image(
                     painter = rememberImagePainter(
-                        data = "https://www.loliapi.com/acg/pp",
+                        data = video.author.avatar,
                         imageLoader = getImageLoader()
                     ),
                     contentDescription = null,
@@ -98,9 +102,11 @@ fun VideoCard(video: Video,navController: NavController) {
 
             }
             Image(
-                painter = rememberImagePainter(
-                    data = video.cover,
+                painter = rememberAsyncImagePainter(
+                    model = video.cover,
+
                     imageLoader = getImageLoader()
+
                 ),
                 contentDescription = null,
                 modifier = Modifier
@@ -119,7 +125,7 @@ fun VideoCard(video: Video,navController: NavController) {
                     .padding(8.dp)
                     .fillMaxWidth()
                     .clip(MaterialTheme.shapes.medium)
-                    .weight(2f)
+                    .weight(2.3f)
                     .padding(start = 12.dp)
             )
             Row(
@@ -127,7 +133,7 @@ fun VideoCard(video: Video,navController: NavController) {
                     .padding(8.dp)
                     .fillMaxWidth()
                     .clip(MaterialTheme.shapes.medium)
-                    .weight(2f)
+                    .weight(2.5f)
             ) {
                 Row(
                     modifier = Modifier
@@ -135,7 +141,7 @@ fun VideoCard(video: Video,navController: NavController) {
                         //.background(MaterialTheme.colorScheme.surfaceContainerLow)
                         .clip(RoundedCornerShape(22.dp))
                         .padding(start = 12.dp)
-                        //.border(2.dp, Color.Red, RoundedCornerShape(22.dp))
+                    //.border(2.dp, Color.Red, RoundedCornerShape(22.dp))
                 ) {
                     Icon(
                         imageVector = Icons.Default.Favorite,
