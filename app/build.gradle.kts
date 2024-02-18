@@ -5,6 +5,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
     kotlin("plugin.lombok") version "1.9.22"
     id("io.freefair.lombok") version "8.1.0"
+    id("org.jetbrains.kotlin.plugin.parcelize")
 }
 
 android {

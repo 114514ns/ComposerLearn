@@ -1,22 +1,30 @@
 package cn.pprocket.composerlearn.page
 
 import android.content.Context
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import cn.pprocket.composerlearn.MainActivity
@@ -33,6 +41,7 @@ import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
 import org.bouncycastle.jce.provider.BouncyCastleProvider
+import java.util.Random
 import javax.crypto.Cipher
 import javax.crypto.spec.SecretKeySpec
 
@@ -60,11 +69,22 @@ fun VideoListPage(navController: NavController) {
     var page = 1
     val listState = rememberLazyGridState()
     var searchText by remember { mutableStateOf("") }
-    Column {
+    val nestedScrollConnection = remember {
+        object : NestedScrollConnection {
+            override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
+                return super.onPostFling(consumed, available)
+            }
+
+            override suspend fun onPreFling(available: Velocity): Velocity {
+                return super.onPreFling(available)
+            }
+        }
+    }
+    Column{
         TextField(
             value = searchText,
             onValueChange = { newText -> searchText = newText },
-            label = { Text("Search") },
+            label = {Text("Search") },
             singleLine = true,
             leadingIcon = { Icon(Icons.Filled.Search, contentDescription = "Search Icon", tint = Color.Gray) },
             modifier = Modifier.fillMaxWidth()
@@ -87,12 +107,13 @@ fun VideoListPage(navController: NavController) {
                 .fillMaxSize()
                 //.padding(bottom = 50.dp)
                 .background(MaterialTheme.colorScheme.surfaceContainerLow)
+                .nestedScroll(nestedScrollConnection)
 
         ) {
 
             items(
                 recommend.size,
-                key = { index -> recommend[index].id}
+                key = { index -> System.currentTimeMillis()+Random().nextLong()}
             ) { index ->
                 val video = recommend[index]
                 if (MainActivity.client is AlphaImpl) {
@@ -181,3 +202,4 @@ class EncryptInterceptor : okhttp3.Interceptor {
 fun getImageLoader():ImageLoader {
     return  createCustomImageLoader(LocalContext.current)
 }
+

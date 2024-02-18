@@ -17,6 +17,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -74,8 +75,10 @@ fun VideoCard(video: Video, navController: NavController) {
                     contentScale = ContentScale.FillBounds,
                     modifier = Modifier
                         .padding(8.dp)
-                        .weight(3f)
-                        .clip(RoundedCornerShape(12.dp))
+                        .weight(2.5f)
+                        .aspectRatio(1f)
+                        .clip(CircleShape)
+
                 )
                 Column {
                     Text(
@@ -101,23 +104,34 @@ fun VideoCard(video: Video, navController: NavController) {
                 )
 
             }
-            Image(
-                painter = rememberAsyncImagePainter(
-                    model = video.cover,
+            Box {
+                Image(
+                    painter = rememberAsyncImagePainter(
+                        model = video.cover,
 
-                    imageLoader = getImageLoader()
+                        imageLoader = getImageLoader()
 
-                ),
-                contentDescription = null,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(8f)
-                    .padding(12.dp)
-                    .height(200.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .border(2.dp, Color.DarkGray, RoundedCornerShape(12.dp)),
-                contentScale = ContentScale.Crop
-            )
+                    ),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        //.weight(8f)
+                        .padding(12.dp)
+                        .height(200.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .border(2.dp, Color.DarkGray, RoundedCornerShape(12.dp)),
+                    contentScale = ContentScale.Crop
+                )
+                Text(
+                    text = video.length.toString() + "s",
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(18.dp)
+                        .background(Color.Black.copy(alpha = 0.5f))
+                        .padding(4.dp),
+                    color = Color.White
+                )
+            }
             Text(
                 text = video.title,
                 fontSize = 14.sp,
